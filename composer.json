@@ -1,0 +1,13 @@
+{
+    "autoload": {
+        "psr-4": {
+            "Models\\": "api/models/",
+            "Controllers\\": "api/controllers/",
+            "Config\\": "api/config/",
+            "Middleware\\": "api/middleware/"
+        }
+    },
+    "require": {
+        "vlucas/phpdotenv": "^5.6"
+    }
+}
