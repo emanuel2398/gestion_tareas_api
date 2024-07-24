@@ -21,7 +21,6 @@ class Database
         $password = $_ENV['DB_PASSWORD'];
 
         $dsn = "mysql:host=$host;dbname=$dbname;charset=$charset";
-
         try {
             $this->pdo = new PDO($dsn, $username, $password);
             $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);

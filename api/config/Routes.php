@@ -2,7 +2,7 @@
 namespace Config;
 
 use Config\Request;
-
+use Exception;
 
 class Routes
 {
@@ -38,18 +38,23 @@ class Routes
         $this->routes['DELETE'][$route] = $callback;
     }
 
-    public function resolve()
+    public function respuesta()
     {
-        $request = new Request();
-        $method = $request->getMethod();
-        $uri = $request->getUri();
-        $baseUri = '/gestion_tareas_api';
-        $normalizedUri = str_replace($baseUri, '', $uri);
-        if (array_key_exists($normalizedUri, $this->routes[$method])) {
-            call_user_func($this->routes[$method][$normalizedUri]);
-        } else {
-            http_response_code(404);
-            echo json_encode(['message' => 'Endpoint not found']);
+        try {
+            $request = new Request();
+            $method = $request->getMethod();
+            $uri = $request->getUri();
+            $baseUri = '/gestion_tareas_api';
+            $normalizedUri = str_replace($baseUri, '', $uri);
+    
+            if (array_key_exists($normalizedUri, $this->routes[$method])) {
+                call_user_func($this->routes[$method][$normalizedUri]);
+            } else {
+                throw new Exception('Endpoint no funciona', 404);
+            }
+        } catch (Exception $e) {
+            http_response_code($e->getCode());
+            echo json_encode(['mensaje' => $e->getMessage()]);
         }
     }
 }

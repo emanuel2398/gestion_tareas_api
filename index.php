@@ -1,19 +1,19 @@
 <?php
-require_once __DIR__ . '/api/config/Database.php';
-require_once __DIR__ . '/api/config/Routes.php';
-require_once __DIR__ . '/api/config/Request.php';
-require_once __DIR__ . '/api/controllers/UsuarioController.php';
-require_once __DIR__ . '/api/controllers/TareaController.php';
+
+use Config\Routes;
+use Controllers\TareaController;
+use Controllers\UsuarioController;
+use Middleware\AuthMiddleware;
 require_once __DIR__ . '/vendor/autoload.php';
 
-// Crear instancia del enrutador
-$router = new Config\Routes();
+$authMiddleware = new AuthMiddleware();
+$authMiddleware->handle();
 
-// Definir rutas
-$router->get('/usuarios/getusuarios', [new Controllers\UsuarioController(), 'getUsuarios']);
-$router->put('/usuarios/desactivarusuario', [new Controllers\UsuarioController(), 'desactivaUsuario']);
-$router->delete('/tareas/eliminartarea', [new Controllers\TareaController(), 'eliminarTarea']);
-$router->post('/tareas/actualizartareas', [new Controllers\TareaController(), 'actualizarTareas']);
+$router = new Routes();
+$router->get('/usuarios/getusuarios', [new UsuarioController(), 'getUsuarios']);
+$router->put('/usuarios/desactivarusuario', [new UsuarioController(), 'desactivaUsuario']);
+$router->delete('/tareas/eliminartarea', [new TareaController(), 'eliminarTarea']);
+$router->post('/tareas/actualizartareas', [new TareaController(), 'actualizarTareas']);
 
-// Resolver la solicitud
-$router->resolve();
+
+$router->respuesta();

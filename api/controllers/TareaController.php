@@ -2,6 +2,7 @@
 namespace Controllers;
 
 use Config\Database;
+use Exception;
 use Models\Tarea;
 
 class TareaController
@@ -15,33 +16,41 @@ class TareaController
 
     public function eliminarTarea()
     {
-        $input = json_decode(file_get_contents('php://input'), true);
+        try {
+            $input = json_decode(file_get_contents('php://input'), true);
 
-        if (isset($input['idtarea'])) {
-            $tareaModel = new Tarea($this->db);
-            if ($tareaModel->deleteTask($input['idtarea'])) {
-                header('Content-Type: application/json');
-                echo json_encode(['message' => 'Tarea eliminada con éxito.']);
-            } else {
-                http_response_code(500);
-                echo json_encode(['message' => 'Error al eliminar la tarea.']);
+            if (!isset($input['idtarea'])) {
+                throw new Exception('Parámetro idtarea faltante.', 400);
             }
-        } else {
-            http_response_code(400);
-            echo json_encode(['message' => 'Parámetro idtarea faltante.']);
+            $tarea = new Tarea($this->db);
+            if ($tarea->deleteTarea($input['idtarea'])) {
+                header('Content-Type: application/json');
+                echo json_encode(['mensaje' => 'Tarea eliminada con éxito.']);
+            } else {
+                throw new Exception('Error al eliminar la tarea.', 500);
+            }
+        } catch (Exception $e) {
+            http_response_code($e->getCode());
+            header('Content-Type: application/json');
+            echo json_encode(['mensaje' => $e->getMessage()]);
         }
     }
 
+
     public function actualizarTareas()
     {
-        $tareaModel = new Tarea($this->db);
-
-        if ($tareaModel->updateTasks()) {
+        try {
+            $tareas = new Tarea($this->db);
+            if ($tareas->updateTareas()) {
+                header('Content-Type: application/json');
+                echo json_encode(['mensaje' => 'Tareas actualizadas con éxito.']);
+            } else {
+                throw new Exception('Error al actualizar las tareas.', 500);
+            }
+        } catch (Exception $e) {
+            http_response_code($e->getCode());
             header('Content-Type: application/json');
-            echo json_encode(['message' => 'Tareas actualizadas con éxito.']);
-        } else {
-            http_response_code(500);
-            echo json_encode(['message' => 'Error al actualizar las tareas.']);
+            echo json_encode(['mensaje' => $e->getMessage()]);
         }
     }
 }

@@ -2,6 +2,7 @@
 namespace Controllers;
 
 use Config\Database;
+use Exception;
 use Models\Usuario;
 
 class UsuarioController
@@ -15,8 +16,8 @@ class UsuarioController
 
     public function getUsuarios()
     {
-        $usuarioModel = new Usuario($this->db);
-        $usuarios = $usuarioModel->getActiveUsers();
+        $usuario = new Usuario($this->db);
+        $usuarios = $usuario->getActiveUsers();
 
         header('Content-Type: application/json');
         echo json_encode($usuarios);
@@ -24,20 +25,26 @@ class UsuarioController
 
     public function desactivaUsuario()
     {
-        $input = json_decode(file_get_contents('php://input'), true);
-
-        if (isset($input['idusuario'])) {
-            $usuarioModel = new Usuario($this->db);
-            if ($usuarioModel->deactivateUser($input['idusuario'])) {
-                header('Content-Type: application/json');
-                echo json_encode(['message' => 'Usuario desactivado con éxito.']);
-            } else {
-                http_response_code(500);
-                echo json_encode(['message' => 'Error al desactivar el usuario.']);
+        try {
+            $input = json_decode(file_get_contents('php://input'), true);
+    
+            if (!isset($input['idusuario'])) {
+                throw new Exception('Parámetro idusuario faltante.', 400);
             }
-        } else {
-            http_response_code(400);
-            echo json_encode(['message' => 'Parámetro idusuario faltante.']);
+    
+            $usuario = new Usuario($this->db);
+    
+            if ($usuario->deactivateUser($input['idusuario'])) {
+                header('Content-Type: application/json');
+                echo json_encode(['mensaje' => 'Usuario desactivado con éxito.']);
+            } else {
+                throw new Exception('Error al desactivar el usuario.', 500);
+            }
+        } catch (Exception $e) {
+            http_response_code($e->getCode());
+            header('Content-Type: application/json');
+            echo json_encode(['mensaje' => $e->getMessage()]);
         }
     }
+    
 }

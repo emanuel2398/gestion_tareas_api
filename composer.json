@@ -3,7 +3,8 @@
         "psr-4": {
             "Models\\": "api/models/",
             "Controllers\\": "api/controllers/",
-            "Config\\": "api/config/"
+            "Config\\": "api/config/",
+            "Middleware\\": "api/middleware/"
         }
     },
     "require": {
